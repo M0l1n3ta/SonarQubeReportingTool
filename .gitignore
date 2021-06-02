@@ -1,0 +1,15 @@
+#ignore all .pyc
+
+**.pyc
+
+**.xlsx
+**.html
+*./test
+.vscode
+*./plugins
+**.jar
+src/templates/~$atic_detail_report_template.docx
+**.zip
+src/templates/SELAE/~$atic_detail_report_template.docx
+src/**.docx
+*.xslx
