@@ -1,9 +1,4 @@
-# ===========================================================================================
-# =============== Archivo main que controla la interaccion con el usuario ===================
-# ===========================================================================================
-#
 #################################################################
-# Software created by: Josue Pradas Sacristan for Sogeti
 # Contact: emilio-jose.roldan-navarro@sogeti.com
 #################################################################
 #
@@ -18,6 +13,7 @@ from sonarqubeAPI import SonarQubeBaseAPI
 import sonarqubeAPI_83
 import reportGen as report
 import utilityGenerator as ugen
+from art import text2art
 
 list = ['8.2','8.3']
 sqc = SonarQubeBaseAPI()
@@ -43,27 +39,11 @@ def get_platform():
 def print_welcome():
     os.system('cls') if get_platform()=="win" else os.system('clear')
     print("  ")
-    print(" +-----------------------------------------------------------------------------------+ ")
-    print(" |                                                                                   | ")
-    print(" |                          X                                                        | ")
-    print(" |                         XXX                                                       | ")
-    print(" |                        XXXXX                                                      | ")
-    print(" |                   XXXXXXXXXXXXXXX              Sonarqube Reporting Tool           | ")
-    print(" |              XXXXXXXXXXXXXXXXXXXXXXXXX         ------------------------           | ")
-    print(" |           XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                         | ")
-    print(" |          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                        | ")
-    print(" |         XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                       | ")
-    print(" |         XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                       | ")
-    print(" |         XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                       | ")
-    print(" |         XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                       | ")
-    print(" |          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                        | ")
-    print(" |             XXXXXXXXXXXX X XXXXXXXXXXXX                                           | ")
-    print(" |                         XXX                emilio-jose.roldan-navarro@sogeti.com  | ")
-    print(" |                       XXXXXXX                                                     | ")
-    print(" |                                                                                   | ")
-    print(" +-----------------------------------------------------------------------------------+ ")
+    print(text2art("ESIIAB","colossal"))
+    print(text2art('''SonarQube  
+    Reporting Tool''', font="small")) 
     print("  ")
-    input("  Press enter to continue...")
+    #input("  Press enter to continue...")
 
 def print_actions(project, issues):
     os.system('cls') if get_platform()=="win" else os.system('clear')
@@ -124,7 +104,7 @@ def exit():
     os.system('cls') if get_platform()=="win" else os.system('clear')
 
 def print_main_menu():
-    os.system('cls') if get_platform()=="win" else os.system('clear')
+    #os.system('cls') if get_platform()=="win" else os.system('clear')
     print(" 1.- Reporting tool")
     print(" 2.- Utility tool")
     print(" 3.- Exit")
