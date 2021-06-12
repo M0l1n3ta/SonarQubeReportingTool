@@ -3,15 +3,20 @@
 # ===========================================================================
 #
 #################################################################
-# Contact: emilio-jose.roldan-navarro@sogeti.com
+# Contact: EmilioJRoldan@gmail.com
 #################################################################
 #
 import maya
 import datetime
-from datetime import date
+import locale
+locale.setlocale(locale.LC_TIME, "es_ES")
 from docxtpl import DocxTemplate, RichText
 import xlsxwriter
 import jinja2
+from sys import path
+from pathlib import Path
+path_root = Path(__file__).parent
+path.append(str(path_root))
 
 import resources
 import os
@@ -72,7 +77,7 @@ def checking_issues(issues, ncloc, languages, project, sqc, ml, duplicity, type,
 
 def generate_detailed_report(project, outputname, sqc) :
     doc = None
-
+    strTemplate = os.path.join(path[0],'templates','static_detail_report_template.docx')
     print("> Calculating language metrics...")
     ncloc = sqc.get_loc(project[1]["key"])
     languages = sqc.get_loc_lang_metrics(project[1]["key"], ncloc)
@@ -111,19 +116,17 @@ def generate_detailed_report(project, outputname, sqc) :
 
     report_date_str = project[1]["lastAnalysisDate"]
     dt = maya.parse(report_date_str).datetime()
-    report_date = str(dt.date().day) + "-" + resources.meses[str(dt.date().month)] + "-" + str(dt.date().year) + " " + str(dt.time())
-    hoy = date.today()
-    today = str(hoy.day) + " de " + resources.meses[str(hoy.month) + "c"] + " de " + str(hoy.year)
+    report_date = '{:%d-%m-%Y %H:%M}'.format(dt)
+    today = '{:%d de %B de %Y}'.format(datetime.datetime.now())
 
-    basedirectory = os.getcwd()
     try:
-        doc = DocxTemplate("templates/static_detail_report_template.docx")
+        doc = DocxTemplate(strTemplate)
     except:
         print("> Error. .docx template file not found.")
     jinja_env = jinja2.Environment(extensions=['jinja2.ext.loopcontrols'])
     if doc:
         rt = RichText()
-        rt.add(project[0], url_id=doc.build_url_id('http://srv-analiza/sonar/dashboard?id=' + project[1]["key"]))
+        rt.add(project[0], url_id=doc.build_url_id(resources.url_base +'dashboard?id=' + project[1]["key"]))
 
         context = {
             'today': today,
@@ -148,7 +151,7 @@ def generate_detailed_report(project, outputname, sqc) :
         doc.render(context, jinja_env)
         doc.save(outputname + ".docx")
 
-    generate_charts(project, languages, sqc, vulnerabilities, bugs_num, code_smells_num, outputname)
+    generate_charts(project, languages, sqc, vulnerabilities_num,hot_spot_num, bugs_num, code_smells_num, outputname)
 
 def generate_executive_report(project, outputname, sqc) :
     doc = None
@@ -182,10 +185,10 @@ def generate_executive_report(project, outputname, sqc) :
         print(".xlsx file already exists")
     else :
         print("> Creating charts file...")
-        generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells, outputname)
+        generate_charts(project, languages, sqc, 1, 1, bugs, code_smells, outputname)
 
 
-def generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells, outputname):
+def generate_charts(project, languages, sqc, vulnerabilities_num,hot_spot_num, bugs, code_smells, outputname):
     print("> Retrieving chart data...")
     workbook = xlsxwriter.Workbook(outputname + '.xlsx')
     worksheet = workbook.add_worksheet()
@@ -227,7 +230,8 @@ def generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells,
 
     data = [
         ['Issues', 'Number of Issues'],
-        ['Vulnerabilities', vulnerabilities],
+        ['Vulnerabilities', vulnerabilities_num],
+        ['Hotspots',hot_spot_num],
         ['Bugs', bugs],
         ['Code Smells', code_smells]
     ]
@@ -242,11 +246,11 @@ def generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells,
 
     pie.add_series({
         'name': ' ',
-        'categories': '=Sheet1!$A$' + str(j) + ':$A$' + str(j+2),
-        'values': '=Sheet1!$B$' + str(j) + ':$B$' + str(j+2),
-        'data_labels': {'percentage':True, 'position':'outside_end'}
+        'categories': '=Sheet1!$A$' + str(j) + ':$A$' + str(j+3),
+        'values': '=Sheet1!$B$' + str(j) + ':$B$' + str(j+3),
+        'data_labels': {'percentage':True, 'position':'best_fit'}
     })
-
+    pie.set_legend({'position':'bottom'})
     pie.set_style(10)
     worksheet.insert_chart('P2', pie, {'x_offset': 25, 'y_offset': 10})
 
@@ -258,8 +262,8 @@ def generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells,
 
     for language in languages :
         #rules = sqc.get_num_rules_by_qprofile(resources.Qprofiles[language[0]])
-        rules = sqc.get_num_rules_by_qprofile(sqc.get_qprofile_key_by_lang(project[1]["key"], language[3]))
-        violations = sqc.get_num_violations_by_lang(project[1]["key"], language[3])
+        rules = sqc.get_num_rules_by_qprofile(sqc.get_qprofile_key_by_lang(project[1]["key"], language[2]))
+        violations = sqc.get_num_violations_by_lang(project[1]["key"], language[2])
         row = [language[0], int(rules - violations) , violations]
         data.append(row)
 
@@ -295,7 +299,7 @@ def generate_charts(project, languages, sqc, vulnerabilities, bugs, code_smells,
     long = 0
     for dates in history[0]["history"]:
         dt = maya.parse(dates["date"]).datetime()
-        report_date = str(dt.date().day) + "/" + resources.meses[str(dt.date().month)] + "/" + str(dt.date().year)
+        report_date = '{:%d-%m-%Y %H:%M}'.format(dt)
         dates_row.append(report_date)
         long += 1
 

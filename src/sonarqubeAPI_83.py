@@ -3,7 +3,7 @@
 #=================================================================
 #
 #################################################################
-# Contact: emilio-jose.roldan-navarro@sogeti.com
+# Contact: EmilioJRoldan@gmail.com
 #################################################################
 #
 
@@ -55,7 +55,7 @@ class SonarQubeAPI83(SonarQubeBaseAPI) :
             sum = 0
             for language in lang :
                 reglas = list()
-                response = requests.get(self.url + "api/issues/search", headers=self.headers, auth=(self.user, self.psw), params={"projectKeys": project, "facets": "rules", "types": type, "languages": language[3], "statuses": "OPEN,CONFIRMED,REOPENED"})
+                response = requests.get(self.url + "api/issues/search", headers=self.headers, auth=(self.user, self.psw), params={"projectKeys": project, "facets": "rules", "types": type, "languages": language[2], "statuses": "OPEN,CONFIRMED,REOPENED"})
                 sum += int(response.json()["total"])
                 rules = response.json()["facets"][0]["values"]
 

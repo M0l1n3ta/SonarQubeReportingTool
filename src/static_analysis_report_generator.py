@@ -1,5 +1,5 @@
 #################################################################
-# Contact: emilio-jose.roldan-navarro@sogeti.com
+# Contact: EmilioJRoldan@gmail.com
 #################################################################
 #
 #!/usr/bin/python
@@ -7,12 +7,15 @@
 
 import os
 import time
-from sys import platform
+from sys import platform, path
+from pathlib import Path
 import requests
+path_root = Path(__file__).parent
+path.append(str(path_root))
 from sonarqubeAPI import SonarQubeBaseAPI
 import sonarqubeAPI_83
 import reportGen as report
-import utilityGenerator as ugen
+import Utilidades.utilityGenerator as ugen
 from art import text2art
 
 list = ['8.2','8.3']
@@ -118,6 +121,7 @@ def print_languages(languages):
     print(" ")
 
 def main():
+    print(path)
     print_welcome()
     heading = ""
     while True:
@@ -127,9 +131,10 @@ def main():
             orgs = sqc.get_organizations()
             if int(select_option) == 1 :
                 heading = "Reporting tool"
-                if print_orgs(orgs,heading):
-                    break
-                select_org = input("> Please select an organization: ")
+                #if print_orgs(orgs,heading):
+                #    break
+                #select_org = input("> Please select an organization: ")
+                select_org = "1"
                 if select_org.isdigit():
                     if(int(select_org) >= 1) & (int(select_org) <= len(orgs)):
                         org = orgs[int(select_org) - 1][1]
