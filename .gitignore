@@ -13,3 +13,4 @@ src/templates/~$atic_detail_report_template.docx
 src/templates/SELAE/~$atic_detail_report_template.docx
 src/**.docx
 *.xslx
+myenv/** 
